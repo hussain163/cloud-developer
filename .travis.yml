@@ -18,4 +18,4 @@ before_install:
 
 
 install:
-  - echo 'hello'
+  - docker-compose -f course-03/deployment/docker-compose-build.yaml build --parallel
