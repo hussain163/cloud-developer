@@ -1,0 +1,43 @@
+version: "3"
+services:
+  reverseproxy:
+    image: hussain163/project3-reverseproxy
+    ports:
+      - 8080:8080
+    restart: always
+    depends_on:
+      - backend-user
+      - backend-feed
+  
+  backend-user:
+    image: hussain163/project3-user
+    volumes:
+      - $HOME/.aws:/root/.aws
+    environment:
+      DEV_USERNAME: $DEV_USERNAME
+      DEV_PASSWORD: $DEV_PASSWORD 
+      DEV_DATABASE: $DEV_DATABASE 
+      DEV_HOST: $DEV_HOST 
+      DEV_AWS_REGION: $DEV_AWS_REGION 
+      DEV_AWS_PROFILE: $DEV_AWS_PROFILE 
+      DEV_AWS_MEDIA_BUCKET: $DEV_AWS_MEDIA_BUCKET
+      JWT_SECRET: $JWT_SECRET
+  
+  backend-feed:
+    image: hussain163/project3-feed
+    volumes:
+      - $HOME/.aws:/root/.aws
+    environment:
+      DEV_USERNAME: $DEV_USERNAME
+      DEV_PASSWORD: $DEV_PASSWORD 
+      DEV_DATABASE: $DEV_DATABASE 
+      DEV_HOST: $DEV_HOST 
+      DEV_AWS_REGION: $DEV_AWS_REGION 
+      DEV_AWS_PROFILE: $DEV_AWS_PROFILE 
+      DEV_AWS_MEDIA_BUCKET: $DEV_AWS_MEDIA_BUCKET
+      JWT_SECRET: $JWT_SECRET    
+  
+  frontend:
+    image: hussain163/project3-frontend
+    ports:
+      - 8100:80
