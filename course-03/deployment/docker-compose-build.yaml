@@ -15,4 +15,4 @@ services:
   frontend:
     build:
       context: ../udacity-c2-frontend  
-    image: hussain163/project3-frontend:local
+    image: hussain163/project3-frontend
