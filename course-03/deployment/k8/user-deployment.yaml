@@ -5,7 +5,7 @@ metadata:
     service: backend-user
   name: backend-user
 spec:
-  replicas: 1
+  replicas: 2
   template:  
     metadata:
       labels:
@@ -17,12 +17,17 @@ spec:
         imagePullPolicy: Always
         resources:
           requests:
-            memory: "64Mi"
-            cpu: "250m"
+            memory: "32Mi"
+            cpu: "125m"
           limits:
-            memory: "1024Mi"
-            cpu: "500m"                    
+            memory: "512Mi"
+            cpu: "250m"                    
         env:
+        - name: DEV_URL
+          valueFrom:
+            configMapKeyRef:
+              name: env-config
+              key: DEV_URL
         - name: DEV_AWS_MEDIA_BUCKET
           valueFrom:
             configMapKeyRef:
