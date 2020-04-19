@@ -1,0 +1,71 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    service: backend-user
+  name: backend-user
+spec:
+  replicas: 2
+  template:  
+    metadata:
+      labels:
+        service: backend-user
+    spec:
+      containers:
+      - image: hussain163/project3-user
+        name: backend-user
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "125m"
+          limits:
+            memory: "512Mi"
+            cpu: "250m"                    
+        env:
+        - name: DEV_URL
+          valueFrom:
+            configMapKeyRef:
+              name: env-config
+              key: DEV_URL
+        - name: DEV_AWS_MEDIA_BUCKET
+          valueFrom:
+            configMapKeyRef:
+              name: env-config
+              key: DEV_AWS_MEDIA_BUCKET
+        - name: DEV_AWS_PROFILE
+          valueFrom:
+            configMapKeyRef:
+              name: env-config
+              key: DEV_AWS_PROFILE
+        - name: DEV_AWS_REGION
+          valueFrom:
+            configMapKeyRef:
+              name: env-config
+              key: DEV_AWS_REGION
+        - name: JWT_SECRET
+          valueFrom:
+            configMapKeyRef:
+              name: env-config
+              key: JWT_SECRET
+        - name: DEV_DATABASE
+          valueFrom:
+            configMapKeyRef:
+              name: env-config
+              key: DEV_DATABASE
+        - name: DEV_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: env-config
+              key: DEV_HOST
+        - name: DEV_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              name: env-config
+              key: DEV_PASSWORD
+        - name: DEV_USERNAME
+          valueFrom:
+            configMapKeyRef:
+              name: env-config
+              key: DEV_USERNAME           
+      restartPolicy: Always
