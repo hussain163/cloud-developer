@@ -31,29 +31,9 @@ provider:
     TODOS_ID_INDEX: TodoIdIndex
     IMAGES_BUCKET: udacity-todo-app-${self:provider.stage}
   
-  tracing:
+  tracing:  #Distributed tracing
     lambda: true
     apiGateway: true
-
-  # iamRoleStatements:
-  #   - Effect: Allow
-  #     Action:
-  #       - dynamodb:Scan
-  #       - dynamodb:Query
-  #       - dynamodb:PutItem
-  #       - dynamodb:DeleteItem
-  #       - dynamodb:UpdateItem
-  #     Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}    
-  #   - Effect: Allow
-  #     Action:
-  #       - dynamodb:Query
-  #     Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}/index/${self:provider.environment.TODOS_ID_INDEX}    
-  #   - Effect: Allow
-  #     Action:
-  #       - s3:PutObject
-  #       - s3:GetObject
-  #     Resource: arn:aws:s3:::${self:provider.environment.IMAGES_BUCKET}/*
-  
 
 functions:
 
@@ -75,7 +55,7 @@ functions:
           - dynamodb:Query
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}    
 
-  # # TODO: Configure this function
+  # TODO: Configure this function
   # CreateTodos:
   CreateTodo:
     handler: src/lambda/http/createTodo.handler
@@ -95,7 +75,7 @@ functions:
           - dynamodb:PutItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}    
 
-  # # TODO: Configure this function
+  # TODO: Configure this function
   UpdateTodo:
     handler: src/lambda/http/updateTodo.handler
     events:
@@ -117,12 +97,8 @@ functions:
         Action:
           - dynamodb:Query
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}/index/${self:provider.environment.TODOS_ID_INDEX}    
-      - Effect: Allow
-        Action:
-          - s3:GetObject
-        Resource: arn:aws:s3:::${self:provider.environment.IMAGES_BUCKET}/*
 
-  # # TODO: Configure this function
+  # TODO: Configure this function
   DeleteTodo:
     handler: src/lambda/http/deleteTodo.handler
     events:
@@ -137,7 +113,7 @@ functions:
           - dynamodb:DeleteItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}    
 
-  # # TODO: Configure this function
+  # TODO: Configure this function
   GenerateUploadUrl:
     handler: src/lambda/http/generateUploadUrl.handler
     events:
@@ -152,6 +128,7 @@ functions:
           - s3:PutObject
         Resource: arn:aws:s3:::${self:provider.environment.IMAGES_BUCKET}/*
 
+  # Sync data with elastic search
   SyncWithElaticSearch:
     environment:
       ES_ENDPOINT: !GetAtt TodoSearch.DomainEndpoint
@@ -176,6 +153,7 @@ resources:
         RestApiId:
           Ref: ApiGatewayRestApi
 
+    # DynamoDb table
     TodosTable:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -193,7 +171,7 @@ resources:
             KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
         TableName: ${self:provider.environment.TODOS_TABLE}
-        StreamSpecification:
+        StreamSpecification:  # Stream data to sync with Elastic Search
           StreamViewType: NEW_IMAGE
         LocalSecondaryIndexes:
           - IndexName: ${self:provider.environment.TODOS_INDEX_NAME}
@@ -244,7 +222,7 @@ resources:
               Resource: 'arn:aws:s3:::${self:provider.environment.IMAGES_BUCKET}/*'
         Bucket: !Ref AttachmentsBucket
 
-    
+    # Elastic Search instance    
     TodoSearch:
       Type: AWS::Elasticsearch::Domain
       Properties:
